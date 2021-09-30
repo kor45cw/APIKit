@@ -1,6 +1,4 @@
-public struct APIKit {
-    public private(set) var text = "Hello, World!"
 
-    public init() {
-    }
-}
+import Foundation
+
+public enum APIKit { }
