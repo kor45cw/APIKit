@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 
 public typealias HTTPHeaders = [String: String]
 
@@ -86,9 +87,9 @@ extension APIDefinition {
     
     func asURLRequest() throws -> URLRequest {
         #if DEBUG
-        print("🎾==========================================================================🎾")
-        print("💞Request💞")
-        print("method : \(method.rawValue), url: \(url)")
+        os_log(.default, log: .data, "🎾==========================================================================🎾")
+        os_log(.default, log: .data, "💞Request💞")
+        os_log(.default, log: .data, "method : %@, url: %@", method.rawValue, url)
         #endif
         
         guard var url = URL(string: url) else {
@@ -114,16 +115,16 @@ extension APIDefinition {
         
         #if DEBUG
         if let allHeaders = urlRequest.allHTTPHeaderFields {
-            print("-----------------Headers-----------------")
-            print(allHeaders)
+            os_log(.default, log: .data, "-----------------Headers-----------------")
+            os_log(.default, log: .data, "%@", allHeaders)
         }
         #endif
         
         let dicParameters = parameters?.dictionary
         #if DEBUG
-        print("-----------------ParameterConvertible---------------")
-        print(dicParameters ?? "")
-        print("🎾==========================================================================🎾")
+        os_log(.default, log: .data, "-----------------ParameterConvertible---------------")
+        os_log(.default, log: .data, "%@", dicParameters ?? "")
+        os_log(.default, log: .data, "🎾==========================================================================🎾")
         #endif
         
         return urlRequest
@@ -148,4 +149,9 @@ extension URL {
         urlComponents.queryItems = queryItems
         self = urlComponents.url!
     }
+}
+
+extension OSLog {
+    private static var moduleSystem = "com.kor45cw.apikit"
+    static let data = OSLog(subsystem: moduleSystem, category: "Data")
 }
