@@ -66,4 +66,17 @@ extension Networking: NetworkProtocol {
             }.resume()
         }
     }
+    
+    @available(iOS 15.0.0, *)
+    public func request<T>(urlRequest: URLRequest) async throws -> T where T : Decodable {
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        
+        guard (200..<300).contains((response as? HTTPURLResponse)?.statusCode ?? 0) else {
+            throw URLError(.badServerResponse)
+        }
+        
+        let output = try JSONDecoder().decode(T.self, from: data)
+        
+        return output
+    }
 }
