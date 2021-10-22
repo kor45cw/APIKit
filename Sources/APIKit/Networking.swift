@@ -34,6 +34,7 @@ extension Networking: NetworkProtocol {
                       }
                 return element.data
             }
+            .log()
             .decode(type: T.self, decoder: JSONDecoder())
             .eraseToAnyPublisher()
     }
