@@ -14,12 +14,12 @@ struct EmptyDecodable: Decodable {}
 
 let serialQueue = DispatchQueue(label: "netwoking", qos: .background)
 
-enum NetworkingError: Error {
+public enum NetworkingError: Error {
     case noData
     case parseError
 }
 
-public class Networking {
+internal class Networking {
     public static let `default` = Networking()
 }
 

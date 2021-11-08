@@ -10,8 +10,12 @@ import OSLog
 
 public typealias HTTPHeaders = [String: String]
 
-public enum ServerHost: String {
-    case a = ""
+public struct ServerHost: RawRepresentable {
+    public var rawValue: String
+    
+    public init(rawValue: String) {
+        self.rawValue = rawValue
+    }
 }
 
 public enum HTTPMethod: String {
@@ -48,7 +52,7 @@ public protocol APIDefinition {
 }
 
 
-extension APIDefinition {
+public extension APIDefinition {
     init(parameters: Parameter? = nil, headers: HTTPHeaders? = nil) {
         self.init()
         self.parameters = parameters
@@ -57,7 +61,7 @@ extension APIDefinition {
 }
 
 
-extension APIDefinition {
+public extension APIDefinition {
     var port: String { "" }
     var contentType: ContentType { .json }
     
