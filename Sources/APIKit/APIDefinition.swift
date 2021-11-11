@@ -112,7 +112,7 @@ public extension APIDefinition {
         
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
-        urlRequest.allHTTPHeaderFields = headers?.dictionary
+        urlRequest.allHTTPHeaderFields = headers
         urlRequest.cachePolicy = cachePolicy
         urlRequest.httpBody = httpBody
         
@@ -127,7 +127,7 @@ public extension APIDefinition {
         let dicParameters = parameters?.dictionary
         #if DEBUG
         os_log(.default, log: .data, "-----------------ParameterConvertible---------------")
-        os_log(.default, log: .data, "%@", dicParameters ?? "")
+        os_log(.default, log: .data, "%@", dicParameters ?? "No Params")
         os_log(.default, log: .data, "🎾==========================================================================🎾")
         #endif
         
@@ -137,18 +137,18 @@ public extension APIDefinition {
 
 
 extension Encodable {
-    var dictionary: [String: String]? {
+    var dictionary: [String: Any]? {
         guard let data = try? JSONEncoder().encode(self) else { return nil }
-        return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: String] }
+        return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any] }
     }
 }
 
 
 extension URL {
-    mutating func appendQueryItem(name: String, value: String?) {
+    mutating func appendQueryItem(name: String, value: Any) {
         guard var urlComponents = URLComponents(string: absoluteString) else { return }
         var queryItems: [URLQueryItem] = urlComponents.queryItems ??  []
-        let queryItem = URLQueryItem(name: name, value: value)
+        let queryItem = URLQueryItem(name: name, value: String(describing: value))
         queryItems.append(queryItem)
         urlComponents.queryItems = queryItems
         self = urlComponents.url!

@@ -34,7 +34,6 @@ public extension NetworkProtocol {
                     observer.onError(NetworkingError.parseError)
                     return
                 }
-                
                 observer.onNext(output)
             }.resume()
             
