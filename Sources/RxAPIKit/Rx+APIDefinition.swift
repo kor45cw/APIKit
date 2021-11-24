@@ -11,6 +11,7 @@ import RxSwift
 public extension APIDefinition {
     @discardableResult
     func request() -> Observable<Response> {
-        network.request(urlRequest: try! self.asURLRequest())
+        network.request(urlRequest: try! self.asURLRequest(),
+                        decoder: decoder)
     }
 }

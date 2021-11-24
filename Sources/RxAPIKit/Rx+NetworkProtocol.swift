@@ -11,7 +11,8 @@ import Foundation
 
 
 public extension NetworkProtocol {
-    func request<T: Decodable>(urlRequest: URLRequest) -> Observable<T> {
+    func request<T: Decodable>(urlRequest: URLRequest,
+                               decoder: JSONDecoder) -> Observable<T> {
         .create { observer in
             URLSession.shared.dataTask(with: urlRequest) { data, response, error in
                 if let error = error {
@@ -30,7 +31,7 @@ public extension NetworkProtocol {
                     return
                 }
                 
-                guard let output = try? JSONDecoder().decode(T.self, from: data) else {
+                guard let output = try? decoder.decode(T.self, from: data) else {
                     observer.onError(NetworkingError.parseError)
                     return
                 }

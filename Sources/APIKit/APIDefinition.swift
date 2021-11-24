@@ -47,6 +47,7 @@ public protocol APIDefinition {
     var cachePolicy: URLRequest.CachePolicy { get }
     var contentType: ContentType { get }
     var network: NetworkProtocol { get }
+    var decoder: JSONDecoder { get }
     
     init()
 }
@@ -75,6 +76,10 @@ public extension APIDefinition {
     
     var network: NetworkProtocol {
         Networking.default
+    }
+    
+    var decoder: JSONDecoder {
+        JSONDecoder()
     }
     
     var cachePolicy: URLRequest.CachePolicy {
