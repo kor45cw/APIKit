@@ -16,7 +16,7 @@ let serialQueue = DispatchQueue(label: "netwoking", qos: .background)
 
 public enum NetworkingError: Error {
     case noData
-    case parseError
+    case parseError(jsonString: String)
 }
 
 internal class Networking {
@@ -24,7 +24,8 @@ internal class Networking {
 }
 
 extension Networking: NetworkProtocol {
-    public func request<T>(urlRequest: URLRequest) -> AnyPublisher<T, Error> where T : Decodable {
+    public func request<T>(urlRequest: URLRequest,
+                           decoder: JSONDecoder) -> AnyPublisher<T, Error> where T : Decodable {
         URLSession.shared.dataTaskPublisher(for: urlRequest)
             .subscribe(on: serialQueue)
             .tryMap() { element -> Data in
@@ -35,11 +36,11 @@ extension Networking: NetworkProtocol {
                 return element.data
             }
             .log()
-            .decode(type: T.self, decoder: JSONDecoder())
+            .decode(type: T.self, decoder: decoder)
             .eraseToAnyPublisher()
     }
     
-    public func request<T>(urlRequest: URLRequest, completion: @escaping (Result<T, Error>) -> Void) where T : Decodable {
+    public func request<T>(urlRequest: URLRequest, decoder: JSONDecoder, completion: @escaping (Result<T, Error>) -> Void) where T : Decodable {
         serialQueue.async {
             URLSession.shared.dataTask(with: urlRequest) { data, response, error in
                 if let error = error {
@@ -58,8 +59,9 @@ extension Networking: NetworkProtocol {
                     return
                 }
                 
-                guard let output = try? JSONDecoder().decode(T.self, from: data) else {
-                    completion(.failure(NetworkingError.parseError))
+                guard let output = try? decoder.decode(T.self, from: data) else {
+                    let jsonString = String(decoding: data, as: UTF8.self)
+                    completion(.failure(NetworkingError.parseError(jsonString: jsonString)))
                     return
                 }
                 
@@ -69,14 +71,14 @@ extension Networking: NetworkProtocol {
     }
     
     @available(iOS 15.0.0, *)
-    public func request<T>(urlRequest: URLRequest) async throws -> T where T : Decodable {
+    public func request<T>(urlRequest: URLRequest, decoder: JSONDecoder) async throws -> T where T : Decodable {
         let (data, response) = try await URLSession.shared.data(for: urlRequest)
         
         guard (200..<300).contains((response as? HTTPURLResponse)?.statusCode ?? 0) else {
             throw URLError(.badServerResponse)
         }
         
-        let output = try JSONDecoder().decode(T.self, from: data)
+        let output = try decoder.decode(T.self, from: data)
         
         return output
     }
