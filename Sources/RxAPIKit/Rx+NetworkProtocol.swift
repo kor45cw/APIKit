@@ -37,6 +37,7 @@ public extension NetworkProtocol {
                     return
                 }
                 observer.onNext(output)
+                observer.onCompleted()
             }
             task.resume()
             
